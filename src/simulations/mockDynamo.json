@@ -1,0 +1,32 @@
+[
+  {
+    "lock_id": "LOCK-101",
+    "device_name": "Main Door Lock",
+    "last_battery_check": "2024-11-10T10:15:00Z",
+    "battery_level": 85
+  },
+  {
+    "lock_id": "LOCK-102",
+    "device_name": "Bedroom Lock",
+    "last_battery_check": "2023-12-01T08:20:00Z",
+    "battery_level": 70
+  },
+  {
+    "lock_id": "LOCK-103",
+    "device_name": "Garage Lock",
+    "last_battery_check": null,
+    "battery_level": 90
+  },
+  {
+    "lock_id": "LOCK-104",
+    "device_name": "Office Backdoor",
+    "last_battery_check": "2024-01-05T12:00:00Z",
+    "battery_level": 40
+  },
+  {
+    "lock_id": "LOCK-105",
+    "device_name": "Store Room Lock",
+    "last_battery_check": "2025-01-10T09:40:00Z",
+    "battery_level": 100
+  }
+]

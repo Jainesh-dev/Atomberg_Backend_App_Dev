@@ -1,0 +1,32 @@
+[
+  {
+    "lock_id": "LOCK-101",
+    "user_id": "USER-9001",
+    "fcm_id": "fcm_token_user_9001_xyz"
+  },
+  {
+    "lock_id": "LOCK-101",
+    "user_id": "USER-9002",
+    "fcm_id": "fcm_token_user_9002_abc"
+  },
+  {
+    "lock_id": "LOCK-102",
+    "user_id": "USER-9010",
+    "fcm_id": "fcm_token_user_9010_def"
+  },
+  {
+    "lock_id": "LOCK-103",
+    "user_id": "USER-9050",
+    "fcm_id": "fcm_token_user_9050_mno"
+  },
+  {
+    "lock_id": "LOCK-104",
+    "user_id": "USER-9200",
+    "fcm_id": "fcm_token_user_9200_pqr"
+  },
+  {
+    "lock_id": "LOCK-105",
+    "user_id": "USER-9301",
+    "fcm_id": "fcm_token_user_9301_stu"
+  }
+]
