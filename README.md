@@ -1,88 +1,58 @@
-# Atomberg – Cloud & Backend Engineering Assignment (Node.js)
+# Atomberg – Cloud & Backend Engineering Assignment
 
-This project implements the weekly notification system described in the assignment.
+This Node.js project implements the weekly notification system described in the assignment.
 
-## 📌 Problem Summary
-- DynamoDB table **`locks`** contains one item per lock, including `last_battery_check`.
-- PostgreSQL table **`lock_user_mapping`** contains `user_id` and `fcm_id` for every `lock_id`.
-- Once every week, we must send an FCM notification to all users whose locks **haven’t had a battery check in the last 1 month**.
+## 📌 Overview
+- DynamoDB table **`locks`** stores each lock and its `last_battery_check` timestamp.
+- PostgreSQL table **`lock_user_mapping`** stores `user_id` and `fcm_id` for every lock.
+- Once a week, the script sends an FCM notification to all users whose locks have **not been checked in the last 1 month**.
 
-This project contains:
-- Full weekly campaign implementation  
+The solution includes:
+- Complete weekly campaign pipeline  
 - Notification sending (real Firebase or mock fallback)  
-- Metrics tracking  
-- A simulation mode that works without AWS/RDS/FCM  
-- A design for click-tracking & campaign effectiveness  
+- Campaign metrics logging  
+- Simulation mode (runs without AWS/RDS/FCM)  
+- Click-tracking & effectiveness measurement design  
 
 ---
-## 📂 Project Structure
-+atomberg-cloud-backend/
-├── src/
-│   ├── config/                        # Environment management
-│   │   ├── env.js                     # Loads ENV variables using dotenv
-│   │   └── validateEnv.js             # Validates required ENV fields
-│   │
-│   ├── core/                          # Core utilities shared across services
-│   │   ├── logger.js                  # Centralized logger (Pino)
-│   │   └── util.js                    # Helper functions (e.g., date utilities)
-│   │
-│   ├── clients/                       # Infrastructure layer
-│   │   ├── dynamoClient.js            # DynamoDB connection (with mock fallback)
-│   │   ├── postgresClient.js          # PostgreSQL client (User mappings / Metrics)
-│   │   └── fcmClient.js               # Firebase FCM (auto-switch to MOCK client if invalid key)
-│   │
-│   ├── services/                      # Business Logic Layer (Domain Services)
-│   │   ├── lockService.js             # Identifies stale locks (> 30 days)
-│   │   ├── userService.js             # Fetches users + FCM tokens for lock IDs
-│   │   ├── notificationService.js     # Sends push notifications (FCM or Mock)
-│   │   ├── metricsService.js          # Saves campaign metrics (sent / failed)
-│   │   └── campaignManager.js         # Orchestrates entire weekly workflow
-│   │
-│   ├── simulations/                   # 🧪 MOCK DATA + Offline testing mode
-│   │   ├── mockDynamo.json            # Sample lock data (local DynamoDB simulation)
-│   │   ├── mockUsers.json             # Sample user–lock mapping data
-│   │   └── simulate.js                # Full pipeline simulation (no AWS/RDS/FCM required)
-│   │
-│   ├── app.js                         # Weekly campaign runner + error handling
-│   └── index.js                       # Main entry point (cron-compatible)
-│
-├── package.json                       # Dependencies + scripts
-├── .env                               # Environment variables (excluded from Git)
-└── README.md                          # Documentation
 
-# --------------------------
-# 🔹 AWS Configuration
-# --------------------------
-AWS_REGION=ap-south-1               # Region of the DynamoDB table
-DYNAMO_LOCKS_TABLE=locks            # DynamoDB table name for lock status data
+## 📁 Project Structure
+```
 
-# --------------------------
-# 🔹 PostgreSQL (RDS)
-# --------------------------
-PG_CONNECTION_STRING=postgres://user:pass@host:5432/dbname
-# Example:
-# PG_CONNECTION_STRING=postgres://postgres:password@localhost:5432/atomberg
+src/
+config/          # env + validation
+core/            # logger + utils
+clients/         # DynamoDB, Postgres, Firebase (or mock)
+services/        # locks, users, notifications, metrics
+simulations/     # mock data + simulate.js
+app.js           # campaign runner
+index.js         # cron entry
 
-# --------------------------
-# 🔹 Firebase Cloud Messaging (FCM)
-# --------------------------
+```
+
+---
+
+## ⚙️ Environment Variables
+Create `.env`:
+
+```
+
+AWS_REGION=ap-south-1
+DYNAMO_LOCKS_TABLE=locks
+PG_CONNECTION_STRING=postgres://user:pass@host/db
 FCM_PROJECT_ID=dummy
 FCM_CLIENT_EMAIL=dummy@dummy
-FCM_PRIVATE_KEY="DUMMY"             # NOTE: If invalid, system auto-falls back to mock FCM
+FCM_PRIVATE_KEY="DUMMY"
+METRICS_TABLE=campaign_metrics
 
-# --------------------------
-# 🔹 Metrics Table
-# --------------------------
-METRICS_TABLE=campaign_metrics      # Table for storing weekly notification results
+```
 
-
-If Firebase credentials are invalid, the code automatically uses a **mock FCM client** so everything runs locally.
+If Firebase credentials are invalid, a **mock FCM client** is automatically used.
 
 ---
 
 ## 🚀 Weekly Campaign Flow
-
-Executed via:
+Triggered via:
 
 ```
 
@@ -91,92 +61,61 @@ npm run start
 ```
 
 Steps:
-1. Compute cutoff date = now − 1 month  
-2. Fetch stale locks from DynamoDB  
-3. Fetch users & FCM tokens from PostgreSQL  
-4. Send FCM notifications  
-5. Save campaign metrics (sent / failed)  
-
-This satisfies all core requirements of the assignment.
+1. Identify stale locks (battery check older than 1 month)  
+2. Fetch corresponding users & FCM tokens  
+3. Send FCM notifications  
+4. Log campaign metrics  
 
 ---
 
-## 📊 Click Tracking & Effectiveness (Bonus)
-
-The system includes a **design** for tracking:
-- User clicks on notifications (via deep link + API)
-- Campaign effectiveness  
-- Click-through rate  
-- Reduction in stale locks after campaigns  
-
-The structure supports adding this with minimal changes.
-
----
-
-## 🧪 Simulation Mode (For Reviewers — No AWS Needed)
-
-Run:
-
+## 🧪 Simulation Mode (No AWS/DB Required)
 ```
 
 npm run simulate
 
 ```
 
-This uses:
-- `mockDynamo.json`
-- `mockUsers.json`
-- A mock FCM client
+Uses mock data for:
+- Locks
+- User mappings
+- Notifications
 
-The entire flow (locks → users → notifications → metrics) runs **without AWS/RDS/FCM**.
+Allows reviewers to test everything locally.
+
+---
+
+## 📊 Bonus: Click Tracking & Effectiveness
+Design included for:
+- Notification click logging via API  
+- CTR calculation  
+- Comparing stale-lock count before vs after campaigns  
 
 ---
 
 ## ▶️ Commands
-
-Install dependencies:
-
 ```
 
 npm install
-
-```
-
-Run weekly campaign:
-
-```
-
-npm run start
-
-```
-
-Run simulation:
-
-```
-
-npm run simulate
+npm run start     # weekly campaign
+npm run simulate  # mock simulation
 
 ```
 
 ---
 
 ## ✅ Requirement Coverage
-
-| Requirement | Status |
-|------------|--------|
-| Read DynamoDB `locks` table | ✅ |
-| Read PostgreSQL `lock_user_mapping` | ✅ |
-| Detect locks not checked in 1 month | ✅ |
-| Send weekly FCM notifications | ✅ |
-| Track sent/failed notifications | ✅ |
-| Design for click-tracking | ✅ (designed) |
-| Design for campaign effectiveness | ✅ (implemented + metrics) |
-| Run without cloud credentials | ✅ simulation mode |
+- Detect stale locks → ✔️  
+- Fetch users & fcm_ids → ✔️  
+- Send weekly FCM notifications → ✔️  
+- Track sent/failed → ✔️  
+- Click tracking & effectiveness → ✔️ (design included)  
+- No-cloud simulation → ✔️  
 
 ---
 
-This project is fully functional, clean, and production-style, with extensibility for analytics and campaign tracking.
+This solution is clean, modular, and production-style, with full support for testing and future extension.
 ```
 
 ---
 
+If you want a **README with a diagram** or **a very minimal 10-line version**, just tell me!
