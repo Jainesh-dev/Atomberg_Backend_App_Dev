@@ -118,4 +118,3 @@ This solution is clean, modular, and production-style, with full support for tes
 
 ---
 
-If you want a **README with a diagram** or **a very minimal 10-line version**, just tell me!
